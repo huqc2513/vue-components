@@ -1,15 +1,15 @@
+
 <template>
   <table>
     <thead class="t-thead">
       <tr>
         <template v-if="selection">
-          <selectionCell v-model="checkedAll" />
+          <selectionCell :value="checkedAll" @on-change="changecheckedAll" />
         </template>
         <th v-for="(col, i) in columns" :key="i">{{ col.title }}</th>
       </tr>
     </thead>
     <tbody>
-
       <tr v-for="(row, i) in list" :key="i">
         <template v-if="selection">
           <selectionCell
@@ -55,33 +55,35 @@ export default {
   },
   data() {
     return {
-      checkedAll: true,
+      checkedAll: false,
       list: []
     }
   },
   watch: {
     checkedAll(checked) {
-      this.transfromChecked(checked)
+      // this.transfromChecked(checked)
     },
     data: {
       immediate: true,
       deep: true,
       handler(val = []) {
-        this.list = val.map((e) => {
+        this.list = val.map(e => {
           e.checked = this.checkedAll
           return e
         })
-        // console.log('list', this.list)
       }
     },
     list: {
       deep: true,
       handler(val) {
-         this.checkAllStatus()
+        this.checkAllStatus()
       }
     }
   },
   methods: {
+    changecheckedAll(checked) {
+      this.transfromChecked(checked)
+    },
     transfromChecked(flag) {
       this.$nextTick(() => {
         this.list.forEach((e, index) => {
@@ -89,25 +91,46 @@ export default {
           const item = e
           this.list.splice(index, 1, item)
         })
+        this.emitCheckedData(this.list)
       })
       // console.log(this.list)
     },
     changeItem(checked = false, index) {
       const item = this.list[index]
       item.checked = checked
+
       if (index !== undefined) {
-        this.list.splice(0, 1, item)
+        this.list.splice(index, 1, item)
       }
 
+      this.emitCheckedData(this.list)
+    },
+    emitCheckedData(list) {
+      let arr = list.map(e => {
+        return e
+      })
+      arr = arr.filter(e => {
+        if (e.checked) {
+          return e
+        }
+      })
+
+      console.log('arr', arr)
     },
     checkAllStatus() {
-      this.checkedAll = this.list.every((e) => { return e.checked})
+      let flag = this.list.every(e => {
+        return e.checked
+      })
+      if (flag) {
+        this.checkedAll = true
+      }
     }
   }
 }
 </script>
 
 <style lang='stylus'>
+
 table {
   position: relative;
   overflow: hidden;

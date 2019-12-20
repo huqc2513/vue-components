@@ -19,10 +19,10 @@ const routes = [
     name: 'swiper',
     component: () => import(/* webpackChunkName: "about" */ '../views/Swiper.vue'),
   },
-  // {
-  //   path: '*',
-  //   redirect: '/table',
-  // },
+  {
+    path: '*',
+    redirect: '/',
+  },
 ];
 
 const router = new VueRouter({

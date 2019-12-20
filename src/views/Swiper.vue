@@ -1,6 +1,6 @@
 <template>
   <div>
-    1
+    滑动轮播图
     <div class="box">
       <div ref="cont" class="container">
         <div class="inner-wrap">
@@ -12,7 +12,8 @@
       </div>
     </div>
 
-    <div>
+    <div class='btn-box'>
+      <button @click.stop="goto(0)">0</button>
       <button @click.stop="goto(1)">1</button>
       <button @click.stop="goto(2)">2</button>
       <button @click.stop="goto(3)">3</button>
@@ -31,8 +32,8 @@ export default {
       el: this.cont
     })
   },
-  methods:{
-    goto(i){
+  methods: {
+    goto(i) {
       this.swiper.setIndex(i)
     }
   }
@@ -78,5 +79,11 @@ export default {
 
 .pink {
   background: pink;
+}
+.btn-box{
+ display flex
+ justify-content center
+ align-items center
+ margin-top 40px
 }
 </style>
