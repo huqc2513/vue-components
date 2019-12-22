@@ -9,10 +9,11 @@
           <div class="green">3</div>
           <div class="pink">4</div>
         </div>
+        <div class="swiper-pagination">   </div>
       </div>
     </div>
 
-    <div class='btn-box'>
+    <div class="btn-box">
       <button @click.stop="goto(0)">0</button>
       <button @click.stop="goto(1)">1</button>
       <button @click.stop="goto(2)">2</button>
@@ -46,23 +47,6 @@ export default {
   margin: 0 auto;
   border: 1px solid red;
   height: 200px;
-
-  .container {
-    width: 100%;
-    height: 200px;
-    display: flex;
-    overflow: hidden;
-
-    .inner-wrap {
-      display: flex;
-
-      div {
-        flex: 0 0 auto;
-        width: 300px;
-        height: 100%;
-      }
-    }
-  }
 }
 
 .yellow {
@@ -80,10 +64,56 @@ export default {
 .pink {
   background: pink;
 }
-.btn-box{
- display flex
- justify-content center
- align-items center
- margin-top 40px
+
+.btn-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.container {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+
+  .inner-wrap {
+    display: flex;
+
+    div {
+      flex: 0 0 auto;
+      width: 300px;
+      height: 100%;
+    }
+  }
+
+  .swiper-pagination {
+    width: 100%;
+    display: flex;
+    height: 20px;
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      display: inline-block;
+      border-radius: 50%;
+      background: #000;
+      margin: 0 4px;
+    }
+
+    .active-dot {
+      border-radius: 10px;
+      background: #FFF !important;
+      width: 20px !important;
+      transition: all 0.2s;
+    }
+  }
 }
 </style>

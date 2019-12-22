@@ -1,24 +1,47 @@
 let defaultOpt = {
-  index:1,
+  index:1, //当前激活图片下标
   loop:true,  //是否开启无缝滚动
   threshold:0.2 , //滑动超过0.2比例即可翻页
+  autoplay:{
+    delay: 2000 , //4秒切换一次
+  },
+  pagination: {
+    el: '.swiper-pagination',
+  }
 }
 
+
+
  class MoveHandle {
-   constructor({el,...opt}){
+    constructor(opt){
+      if(!opt.el){
+        return
+      }
+      this.initParameter(defaultOpt,opt)
+      this.initEvent()
+      this.initAotuplay()
+      this.renderdot()
+      this.setIndex(this.index,false)
+    }
 
-     Object.assign(defaultOpt,opt)
-     this.opt = defaultOpt
-     this.el = el
-     this.index = defaultOpt.index
-     this.EleHandle = new EleHandle({el:el.firstElementChild,opt:this.opt})
-     this.handleEvent = this.handleEvent.bind(this)
-     this.maxIndex  =  this.el.firstElementChild.children.length
-     this.elwidth = el.offsetWidth
-     this.initEvent(this.el)
-   }
+    initParameter(defaultOpt,opt){
+      Object.assign(defaultOpt,opt)
+      this.opt = defaultOpt
+      this.el = opt.el
+      this.index = defaultOpt.index
+      if(this.el.firstElementChild){
+        this.EleHandle = new EleHandle({
+          el:this.el.firstElementChild,
+          opt:this.opt
+        })
+        this.maxIndex  =  this.el.firstElementChild.children.length
+        this.elwidth = this.el.offsetWidth
+      }
+    }
 
-    initEvent(el){
+    initEvent(){
+      let el = this.el
+      this.handleEvent = this.handleEvent.bind(this)
       addEvent(el,'touchstart',this.handleEvent)
       addEvent(el,'mousedown',this.handleEvent)
       addEvent(el,'touchmove',this.handleEvent)
@@ -26,6 +49,50 @@ let defaultOpt = {
       addEvent(el,'touchend',this.handleEvent)
       addEvent(el,'mouseup',this.handleEvent)
       addEvent(el.firstElementChild,'transitionend',this.handleEvent)
+    }
+
+   renderdot(){
+    let { pagination , loop } = this.opt
+    let el = pagination.el
+    let parentNode = this.el.querySelector(el)
+
+
+    let length =  this.el.firstElementChild.children.length
+    let idx = 0
+    let fragment = document.createDocumentFragment();
+    if(parentNode){
+      if(loop){
+        length = length -2
+      }
+      while(idx <length ){
+        idx ++
+        let node = document.createElement('span')
+        node.setAttribute('index',idx)
+        if(idx === this.index){
+          node.setAttribute('class','dot active-dot')
+        }else{
+          node.setAttribute('class','dot')
+        }
+        fragment.appendChild(node)
+      }
+      parentNode.innerHTML = ''
+      parentNode.appendChild(fragment)
+    }
+   }
+
+    initAotuplay(){
+      let { autoplay = false ,loop  } = this.opt
+      if(autoplay){
+        let delay =  autoplay.delay
+        setInterval(()=>{
+          if(this.index >= this.maxIndex){
+              this.index = 1
+          }else{
+            this.index++
+          }
+          this.setIndex(this.index)
+        },delay)
+      }
     }
 
     destroy(){
@@ -44,7 +111,6 @@ let defaultOpt = {
 
     }
     _move(e){
-      console.log(this.state)
       if(!this.state){
         return
       }
@@ -73,8 +139,24 @@ let defaultOpt = {
          this.EleHandle.calculateOffsetX(this.index)
       }
     }
+    setDotIndex(index){
+      if(index<=1){
+        index = 0
+      }else{
+        index --
+      }
+      let { pagination } = this.opt
+      let el = pagination.el
+      let children = this.el.querySelector(el).children
+      if(children){
+        children.forEach(e=>{
+          e.classList.remove('active-dot')
+        })
+        children[index] && children[index].classList.add('active-dot')
+      }
+    }
 
-    setIndex(index){
+    setIndex(index,useTranstion=true){
       if(index<=1){
         index= 1
       }
@@ -86,7 +168,9 @@ let defaultOpt = {
          }else{
          }
       }
-      this.EleHandle.calculateOffsetX(index)
+      this.index = index
+      this.setDotIndex(this.index)
+      this.EleHandle.calculateOffsetX(index,useTranstion)
     }
 
     // 修正无缝滚动偏移量
@@ -94,13 +178,12 @@ let defaultOpt = {
       //边界条件只有到最后一位和第一位才会修复偏移量
       if( this.index === 0 ){
          this.index = this.maxIndex - 2
-         this.EleHandle.calculateOffsetX(this.index,false)
+         this.setIndex(this.index,false)
       }
       if(this.index === this.maxIndex-1){
         this.index = 1
-        this.EleHandle.calculateOffsetX(this.index,false)
+        this.setIndex(this.index,false)
       }
-
     }
 
 
@@ -129,7 +212,6 @@ let defaultOpt = {
       case 'MSTransitionEnd':
         this.EleHandle.removeTranstion()
         if(this.opt.loop){
-          // 修正无缝滚动偏移量
           this.correctionLoopOffsetX()
         }
         break
