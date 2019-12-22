@@ -79,12 +79,11 @@ let defaultOpt = {
       parentNode.appendChild(fragment)
     }
    }
-
-    initAotuplay(){
+   initAotuplay(){
       let { autoplay = false ,loop  } = this.opt
       if(autoplay){
         let delay =  autoplay.delay
-        setInterval(()=>{
+        this.AotuplayInterval =  setInterval(()=>{
           if(this.index >= this.maxIndex){
               this.index = 1
           }else{
@@ -94,7 +93,10 @@ let defaultOpt = {
         },delay)
       }
     }
-
+    resetInterVal(run){
+      clearInterval(this.AotuplayInterval)
+      run && this.initAotuplay()
+    }
     destroy(){
       let arr = ['touchstart','mousedown','touchmove','mousemove','touchend','mouseup','']
       arr.forEach(eventname=>{
@@ -108,6 +110,7 @@ let defaultOpt = {
       let point = e.touches ? e.touches[0] : e
       this.startX = point.pageX
       this.startY = point.pageY
+      this.resetInterVal()
 
     }
     _move(e){
@@ -134,9 +137,10 @@ let defaultOpt = {
         }else if(this.direction ==='right'){
           this.index = this.index >= this.maxIndex-1 ? this.maxIndex -1:this.index+1
         }
-         this.EleHandle.calculateOffsetX(this.index)
+        this.setIndex(this.index)
       }else{
-         this.EleHandle.calculateOffsetX(this.index)
+         this.setIndex(this.index)
+
       }
     }
     setDotIndex(index){
@@ -170,6 +174,7 @@ let defaultOpt = {
       }
       this.index = index
       this.setDotIndex(this.index)
+      this.resetInterVal(true)
       this.EleHandle.calculateOffsetX(index,useTranstion)
     }
 
